@@ -10,11 +10,10 @@ class PaymentRequest {
   String? description;
   Map<String, dynamic>? metadata;
   late PaymentRequestSource source;
-  String? givenID;
+  late String givenID;
   String callbackUrl = PaymentConfig.callbackUrl;
 
-  PaymentRequest(
-      PaymentConfig config, PaymentRequestSource paymentRequestSource) {
+  PaymentRequest(PaymentConfig config, PaymentRequestSource paymentRequestSource) {
     amount = config.amount;
     currency = config.currency;
     description = config.description;
@@ -30,6 +29,6 @@ class PaymentRequest {
         'description': description,
         'metadata': metadata,
         'callback_url': callbackUrl,
-        if (givenID != null) 'given_id': givenID,
+        'given_id': givenID,
       };
 }

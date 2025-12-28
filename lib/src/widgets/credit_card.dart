@@ -9,13 +9,8 @@ import 'package:moyasar/src/widgets/three_d_s_webview.dart';
 
 /// The widget that shows the Credit Card form and manages the 3DS step.
 class CreditCard extends StatefulWidget {
-  CreditCard(
-      {super.key,
-        required this.config,
-        required this.onPaymentResult,
-        this.locale = const Localization.en()})
-      : textDirection =
-  locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr;
+  CreditCard({super.key, required this.config, required this.onPaymentResult, this.locale = const Localization.en()})
+      : textDirection = locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr;
 
   final Function onPaymentResult;
   final PaymentConfig config;
@@ -65,15 +60,9 @@ class _CreditCardState extends State<CreditCard> {
   // Check if button should be enabled
   bool get _isButtonEnabled {
     // Check if all fields are filled and there are no errors
-    bool allFieldsFilled = _nameFieldFilled &&
-        _cardNumberFieldFilled &&
-        _expiryFieldFilled &&
-        _cvcFieldFilled;
+    bool allFieldsFilled = _nameFieldFilled && _cardNumberFieldFilled && _expiryFieldFilled && _cvcFieldFilled;
 
-    bool noErrors = _nameError == null &&
-        _cardNumberError == null &&
-        _expiryError == null &&
-        _cvcError == null;
+    bool noErrors = _nameError == null && _cardNumberError == null && _expiryError == null && _cvcError == null;
 
     return allFieldsFilled && noErrors && !_isSubmitting;
   }
@@ -83,8 +72,7 @@ class _CreditCardState extends State<CreditCard> {
 
     closeKeyboard();
 
-    bool isValidForm =
-        _formKey.currentState != null && _formKey.currentState!.validate();
+    bool isValidForm = _formKey.currentState != null && _formKey.currentState!.validate();
 
     if (!isValidForm) {
       setState(() => _autoValidateMode = AutovalidateMode.onUserInteraction);
@@ -93,28 +81,21 @@ class _CreditCardState extends State<CreditCard> {
 
     _formKey.currentState?.save();
 
-    final source = CardPaymentRequestSource(
-        creditCardData: _cardData,
-        tokenizeCard: _tokenizeCard,
-        manualPayment: _manualPayment);
+    final source = CardPaymentRequestSource(creditCardData: _cardData, tokenizeCard: _tokenizeCard, manualPayment: _manualPayment);
     final paymentRequest = PaymentRequest(widget.config, source);
 
     setState(() => _isSubmitting = true);
 
-    final result = await Moyasar.pay(
-        apiKey: widget.config.publishableApiKey,
-        paymentRequest: paymentRequest);
+    final result = await Moyasar.pay(apiKey: widget.config.publishableApiKey, paymentRequest: paymentRequest);
 
     setState(() => _isSubmitting = false);
 
-    if (result is! PaymentResponse ||
-        result.status != PaymentStatus.initiated) {
+    if (result is! PaymentResponse || result.status != PaymentStatus.initiated) {
       widget.onPaymentResult(result);
       return;
     }
 
-    final String transactionUrl =
-        (result.source as CardPaymentResponseSource).transactionUrl;
+    final String transactionUrl = (result.source as CardPaymentResponseSource).transactionUrl;
 
     if (mounted) {
       Navigator.push(
@@ -131,8 +112,7 @@ class _CreditCardState extends State<CreditCard> {
                     result.status = PaymentStatus.authorized;
                   } else {
                     result.status = PaymentStatus.failed;
-                    (result.source as CardPaymentResponseSource).message =
-                        message;
+                    (result.source as CardPaymentResponseSource).message = message;
                   }
                   Navigator.pop(context);
                   widget.onPaymentResult(result);
@@ -153,8 +133,7 @@ class _CreditCardState extends State<CreditCard> {
   void _validateCardNumber(String? value) {
     setState(() {
       _cardNumberError = CardUtils.validateCardNum(value, widget.locale);
-      _cardNumberFieldFilled =
-          value != null && value.replaceAll(' ', '').length >= 13;
+      _cardNumberFieldFilled = value != null && value.replaceAll(' ', '').length >= 13;
 
       if (value != null && value.isNotEmpty) {
         final cleaned = value.replaceAll(RegExp(r'\D'), '');
@@ -215,9 +194,7 @@ class _CreditCardState extends State<CreditCard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(_nameError ?? widget.locale.nameOnCard,
-              textAlign: widget.textDirection == TextDirection.rtl
-                  ? TextAlign.right
-                  : TextAlign.left,
+              textAlign: widget.textDirection == TextDirection.rtl ? TextAlign.right : TextAlign.left,
               style: TextStyle(
                 fontFamily: 'Aeonik',
                 fontWeight: FontWeight.w500, // Medium weight
@@ -241,10 +218,7 @@ class _CreditCardState extends State<CreditCard> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             child: CardFormField(
-              inputDecoration: buildInputDecoration(
-                  hintText: widget.locale.nameOnCard,
-                  hideBorder: true,
-                  hintTextDirection: widget.textDirection),
+              inputDecoration: buildInputDecoration(hintText: widget.locale.nameOnCard, hideBorder: true, hintTextDirection: widget.textDirection),
               keyboardType: TextInputType.text,
               onChanged: _validateName,
               onSaved: (value) => _cardData.name = value ?? '',
@@ -256,23 +230,13 @@ class _CreditCardState extends State<CreditCard> {
           SizedBox(
             height: 30,
           ),
-          Text(
-              _cardNumberError ??
-                  _expiryError ??
-                  _cvcError ??
-                  widget.locale.cardInformation,
-              textAlign: widget.textDirection == TextDirection.rtl
-                  ? TextAlign.right
-                  : TextAlign.left,
+          Text(_cardNumberError ?? _expiryError ?? _cvcError ?? widget.locale.cardInformation,
+              textAlign: widget.textDirection == TextDirection.rtl ? TextAlign.right : TextAlign.left,
               style: TextStyle(
                 fontFamily: 'Aeonik',
                 fontWeight: FontWeight.w500, // Medium weight
                 fontSize: 16,
-                color: (_cardNumberError != null ||
-                    _expiryError != null ||
-                    _cvcError != null)
-                    ? Colors.red
-                    : Colors.black,
+                color: (_cardNumberError != null || _expiryError != null || _cvcError != null) ? Colors.red : Colors.black,
               )),
           SizedBox(
             height: 8,
@@ -291,9 +255,7 @@ class _CreditCardState extends State<CreditCard> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             child: Column(
-              crossAxisAlignment: widget.textDirection == TextDirection.rtl
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment: widget.textDirection == TextDirection.rtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 CardFormField(
                   inputDecoration: buildInputDecoration(
@@ -310,8 +272,7 @@ class _CreditCardState extends State<CreditCard> {
                     LengthLimitingTextInputFormatter(16),
                     CardNumberInputFormatter(),
                   ],
-                  onSaved: (value) =>
-                  _cardData.number = CardUtils.getCleanedNumber(value!),
+                  onSaved: (value) => _cardData.number = CardUtils.getCleanedNumber(value!),
                 ),
                 const Divider(height: 2),
                 Row(
@@ -319,9 +280,7 @@ class _CreditCardState extends State<CreditCard> {
                   children: [
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: widget.textDirection == TextDirection.rtl
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
+                        crossAxisAlignment: widget.textDirection == TextDirection.rtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                         children: [
                           CardFormField(
                             inputDecoration: buildInputDecoration(
@@ -336,12 +295,9 @@ class _CreditCardState extends State<CreditCard> {
                             ],
                             onChanged: _validateExpiry,
                             onSaved: (value) {
-                              List<String> expireDate = CardUtils.getExpiryDate(
-                                  value!.replaceAll('\u200E', ''));
-                              _cardData.month =
-                                  expireDate.first.replaceAll('\u200E', '');
-                              _cardData.year =
-                                  expireDate[1].replaceAll('\u200E', '');
+                              List<String> expireDate = CardUtils.getExpiryDate(value!.replaceAll('\u200E', ''));
+                              _cardData.month = expireDate.first.replaceAll('\u200E', '');
+                              _cardData.year = expireDate[1].replaceAll('\u200E', '');
                             },
                           ),
                         ],
@@ -357,9 +313,7 @@ class _CreditCardState extends State<CreditCard> {
                     ),
                     Expanded(
                       child: Column(
-                        crossAxisAlignment: widget.textDirection == TextDirection.rtl
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
+                        crossAxisAlignment: widget.textDirection == TextDirection.rtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                         children: [
                           CardFormField(
                             inputDecoration: buildInputDecoration(
@@ -390,8 +344,7 @@ class _CreditCardState extends State<CreditCard> {
             child: SizedBox(
               child: ElevatedButton(
                 style: ButtonStyle(
-                  minimumSize:
-                  const WidgetStatePropertyAll<Size>(Size.fromHeight(52)),
+                  minimumSize: const WidgetStatePropertyAll<Size>(Size.fromHeight(52)),
                   backgroundColor: WidgetStatePropertyAll<Color>(
                     _isButtonEnabled ? blueColor : lightBlueColor,
                   ),
@@ -404,48 +357,48 @@ class _CreditCardState extends State<CreditCard> {
                 onPressed: _isButtonEnabled ? _saveForm : null,
                 child: _isSubmitting
                     ? const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                )
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      )
                     : Directionality(
-                  textDirection: widget.textDirection,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    textDirection: widget.textDirection,
-                    children: [
-                      Spacer(),
-                      Text(
-                        '${widget.locale.pay} ',
-                        style: const TextStyle(
-                          fontFamily: 'Aeonik',
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500, // Medium weight
-                          fontSize: 16,
-                        ),
                         textDirection: widget.textDirection,
-                      ),
-                      SizedBox(
-                          width: 16,
-                          child: Image.asset(
-                            'assets/images/saudiriyal.png',
-                            color: Colors.white,
-                            package: 'moyasar',
-                          )),
-                      const SizedBox(width: 4),
-                      Text(
-                        getAmount(widget.config.amount),
-                        style: const TextStyle(
-                          fontFamily: 'Aeonik',
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500, // Medium weight
-                          fontSize: 16,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          textDirection: widget.textDirection,
+                          children: [
+                            Spacer(),
+                            Text(
+                              '${widget.locale.pay} ',
+                              style: const TextStyle(
+                                fontFamily: 'Aeonik',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500, // Medium weight
+                                fontSize: 16,
+                              ),
+                              textDirection: widget.textDirection,
+                            ),
+                            SizedBox(
+                                width: 16,
+                                child: Image.asset(
+                                  'assets/images/saudiriyal.png',
+                                  color: Colors.white,
+                                  package: 'moyasar',
+                                )),
+                            const SizedBox(width: 4),
+                            Text(
+                              getAmount(widget.config.amount),
+                              style: const TextStyle(
+                                fontFamily: 'Aeonik',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500, // Medium weight
+                                fontSize: 16,
+                              ),
+                              textDirection: widget.textDirection,
+                            ),
+                            Spacer(),
+                          ],
                         ),
-                        textDirection: widget.textDirection,
                       ),
-                      Spacer(),
-                    ],
-                  ),
-                ),
               ),
             ),
           ),
@@ -484,30 +437,30 @@ class SaveCardNotice extends StatelessWidget {
 
     return tokenizeCard
         ? Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Directionality(
-          textDirection: textDirection,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            textDirection: textDirection,
-            children: [
-              Icon(
-                Icons.info,
-                color: blueColor,
+            padding: const EdgeInsets.all(8.0),
+            child: Directionality(
+              textDirection: textDirection,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                textDirection: textDirection,
+                children: [
+                  Icon(
+                    Icons.info,
+                    color: blueColor,
+                  ),
+                  SizedBox(width: 5),
+                  Flexible(
+                    child: Text(
+                      locale.saveCardNotice,
+                      style: TextStyle(fontFamily: 'Aeonik', color: blueColor, fontWeight: FontWeight.w500),
+                      textDirection: textDirection,
+                      textAlign: isRTL ? TextAlign.right : TextAlign.left,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: 5),
-              Flexible(
-                child: Text(
-                  locale.saveCardNotice,
-                  style: TextStyle(fontFamily: 'Aeonik', color: blueColor, fontWeight: FontWeight.w500),
-                  textDirection: textDirection,
-                  textAlign: isRTL ? TextAlign.right : TextAlign.left,
-                ),
-              ),
-            ],
-          ),
-        ))
+            ))
         : const SizedBox.shrink();
   }
 }
@@ -523,13 +476,13 @@ class CardFormField extends StatelessWidget {
 
   const CardFormField(
       {super.key,
-        required this.onSaved,
-        this.validator,
-        this.onChanged,
-        this.inputDecoration,
-        this.keyboardType = TextInputType.number,
-        this.textInputAction = TextInputAction.next,
-        this.inputFormatters});
+      required this.onSaved,
+      this.validator,
+      this.onChanged,
+      this.inputDecoration,
+      this.keyboardType = TextInputType.number,
+      this.textInputAction = TextInputAction.next,
+      this.inputFormatters});
 
   @override
   Widget build(BuildContext context) {
@@ -545,9 +498,7 @@ class CardFormField extends StatelessWidget {
         onChanged: onChanged,
         inputFormatters: inputFormatters,
         textDirection: inputDecoration?.hintTextDirection,
-        textAlign: inputDecoration?.hintTextDirection == TextDirection.rtl
-            ? TextAlign.right
-            : TextAlign.left,
+        textAlign: inputDecoration?.hintTextDirection == TextDirection.rtl ? TextAlign.right : TextAlign.left,
       ),
     );
   }
@@ -565,12 +516,12 @@ String getAmount(int amount) {
 
 InputDecoration buildInputDecoration(
     {required String hintText,
-      required TextDirection hintTextDirection,
-      bool addNetworkIcons = false,
-      bool hideBorder = false,
-      PaymentConfig? config,
-      CardNetwork? detectedNetwork,
-      bool unsupportedNetwork = false}) {
+    required TextDirection hintTextDirection,
+    bool addNetworkIcons = false,
+    bool hideBorder = false,
+    PaymentConfig? config,
+    CardNetwork? detectedNetwork,
+    bool unsupportedNetwork = false}) {
   Widget? iconWidget;
   if (addNetworkIcons && config != null) {
     if (detectedNetwork != null) {
@@ -580,12 +531,12 @@ InputDecoration buildInputDecoration(
         // Show only the detected network icon when it's supported
         iconWidget = NetworkIcons(
           config: PaymentConfig(
-            publishableApiKey: config.publishableApiKey,
-            amount: config.amount,
-            currency: config.currency,
-            description: config.description,
-            supportedNetworks: [PaymentNetwork.values.firstWhere((e) => e.name == detectedName)],
-          ),
+              publishableApiKey: config.publishableApiKey,
+              amount: config.amount,
+              currency: config.currency,
+              description: config.description,
+              supportedNetworks: [PaymentNetwork.values.firstWhere((e) => e.name == detectedName)],
+              givenID: config.givenID),
           textDirection: hintTextDirection,
         );
       } else {
@@ -622,17 +573,11 @@ void closeKeyboard() => FocusManager.instance.primaryFocus?.unfocus();
 
 BorderRadius defaultBorderRadius = const BorderRadius.all(Radius.circular(8));
 
-OutlineInputBorder defaultEnabledBorder = OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.grey[400]!),
-    borderRadius: defaultBorderRadius);
+OutlineInputBorder defaultEnabledBorder = OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[400]!), borderRadius: defaultBorderRadius);
 
-OutlineInputBorder defaultFocusedBorder = OutlineInputBorder(
-    borderSide: BorderSide(color: Colors.grey[600]!),
-    borderRadius: defaultBorderRadius);
+OutlineInputBorder defaultFocusedBorder = OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[600]!), borderRadius: defaultBorderRadius);
 
-OutlineInputBorder defaultErrorBorder = OutlineInputBorder(
-    borderSide: const BorderSide(color: Colors.red),
-    borderRadius: defaultBorderRadius);
+OutlineInputBorder defaultErrorBorder = OutlineInputBorder(borderSide: const BorderSide(color: Colors.red), borderRadius: defaultBorderRadius);
 
 Color blueColor = const Color(0xFF768DFF); // Updated color
 Color lightBlueColor = const Color(0xFF768DFF).withOpacity(0.3); // Adjusted light blue color too

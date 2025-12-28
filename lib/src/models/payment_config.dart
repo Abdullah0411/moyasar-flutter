@@ -59,7 +59,7 @@ class PaymentConfig {
   CreditCardConfig? creditCard;
 
   /// given_id It is going be the ID of the created payment.
-  String? givenID;
+  String givenID;
 
   PaymentConfig(
       {required this.publishableApiKey,
@@ -70,21 +70,14 @@ class PaymentConfig {
       List<PaymentNetwork>? supportedNetworks,
       this.applePay,
       this.creditCard,
-      this.givenID})
-      : supportedNetworks = (supportedNetworks ?? const [
-          PaymentNetwork.visa,
-          PaymentNetwork.mada,
-          PaymentNetwork.masterCard
-        ]).toSet().toList(),
-        assert(publishableApiKey.isNotEmpty,
-            'Please fill `publishableApiKey` argument with your key.'),
+      required this.givenID})
+      : supportedNetworks = (supportedNetworks ?? const [PaymentNetwork.visa, PaymentNetwork.mada, PaymentNetwork.masterCard]).toSet().toList(),
+        assert(publishableApiKey.isNotEmpty, 'Please fill `publishableApiKey` argument with your key.'),
         assert(amount > 0, 'Please add a positive amount.'),
         assert(description.isNotEmpty, 'Please add a description.'),
-        assert((supportedNetworks ?? const [
-          PaymentNetwork.amex,
-          PaymentNetwork.visa,
-          PaymentNetwork.mada,
-          PaymentNetwork.masterCard
-        ]).toSet().isNotEmpty,
+        assert(
+            (supportedNetworks ?? const [PaymentNetwork.amex, PaymentNetwork.visa, PaymentNetwork.mada, PaymentNetwork.masterCard])
+                .toSet()
+                .isNotEmpty,
             'At least 1 network must be supported.');
 }
